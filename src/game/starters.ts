@@ -24,15 +24,15 @@ function star(count: number, inner: number, outer: number, ears: boolean): Vec[]
 
 function fish(): Vec[] {
   const pts: Vec[] = [];
-  const n = 14;
+  const n = 16;
   for (let i = 0; i < n; i++) {
     const a = (i / n) * Math.PI * 2;
-    const r = 46 - 12 * Math.abs(Math.sin(a * 2));
-    pts.push({ x: Math.cos(a) * r * 1.15, y: Math.sin(a) * r * 0.8 });
+    const r = 64 - 18 * Math.abs(Math.sin(a * 2));
+    pts.push({ x: Math.cos(a) * r * 1.1, y: Math.sin(a) * r * 0.85 });
   }
-  pts.push({ x: -72, y: -30 });
-  pts.push({ x: -56, y: 0 });
-  pts.push({ x: -72, y: 30 });
+  pts.push({ x: -70, y: -22 });
+  pts.push({ x: -52, y: 0 });
+  pts.push({ x: -70, y: 22 });
   return pts;
 }
 
@@ -59,7 +59,12 @@ const RAW: Starter[] = [
   { id: 'ghost', name: 'Ghost', points: ghost() },
 ];
 
-/** Starter outlines scaled to fit `radius`. */
+/** Full-size starter outlines — these become anatomy. */
+export function starterShapes(): Starter[] {
+  return RAW.map((s) => ({ id: s.id, name: s.name, points: s.points.map((p) => ({ x: p.x, y: p.y })) }));
+}
+
+/** Starter outlines scaled to fit `radius` — thumbnails only. */
 export function starterOutlines(radius: number): Starter[] {
   return RAW.map((s) => {
     const r = outlineRadius(s.points) || 1;
