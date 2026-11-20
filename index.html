@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#1b1030" />
+    <meta
+      name="description"
+      content="INKBOUND — draw a beast with one stroke. Its shape becomes its stats. Survive sixty seconds."
+    />
+    <title>INKBOUND — Draw Your Beast</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231b1030'/%3E%3Cpath d='M32 8 40 24 58 28 45 41 48 59 32 51 16 59 19 41 6 28 24 24Z' fill='%237a2fc0'/%3E%3Ccircle cx='27' cy='32' r='3' fill='%23ffffff'/%3E%3Ccircle cx='37' cy='32' r='3' fill='%23ffffff'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <canvas id="stage" aria-label="Arena"></canvas>
+
+    <!-- ================= ARENA HUD ================= -->
+    <div id="hud" class="hud is-hidden">
+      <div class="hud-row">
+        <div class="hp-chip">
+          <span class="hp-ico">&#10084;</span>
+          <div class="hp"><i id="hp-fill"></i></div>
+          <span id="hp-text">0/0</span>
+        </div>
+        <div class="chip" id="wave-chip">WAVE 1/9</div>
+        <div class="chip" id="timer-chip">01:00</div>
+      </div>
+      <div class="hud-score"><span id="score">0</span><b id="mult">x1</b></div>
+    </div>
+
+    <!-- ================= TITLE ================= -->
+    <section class="screen screen--title" id="screen-title">
+      <div class="title-wrap">
+        <div class="logo-block">
+          <h1 class="logo">INKBOUND</h1>
+          <p class="logo-sub">Draw Your Beast</p>
+        </div>
+        <canvas id="title-beast" class="title-beast" width="360" height="300"></canvas>
+        <div class="title-actions">
+          <button class="btn gold" id="btn-play" type="button">DAILY CHALLENGE</button>
+          <button class="btn violet" id="btn-free" type="button">FREE PLAY</button>
+          <div class="row-buttons">
+            <button class="btn violet thin" id="btn-levels" type="button">LEVELS</button>
+            <button class="btn violet thin" id="btn-mybeasts" type="button">MY BEASTS</button>
+          </div>
+          <button class="link" id="btn-how" type="button">How to play</button>
+        </div>
+        <button class="icon-btn" id="btn-mute" type="button">SOUND ON</button>
+        <p class="micro" id="seed-chip">DAILY &middot; seed</p>
+        <p class="micro" id="title-meta">best 0 &middot; 0 beasts drawn</p>
+      </div>
+    </section>
+
+    <!-- ================= LEVELS ================= -->
+    <section class="screen is-hidden" id="screen-levels">
+      <div class="screen-wrap">
+        <h2 class="screen-title">LEVELS (ARENAS)</h2>
+        <div class="levels" id="levels-list"></div>
+        <button class="btn violet" id="btn-levels-back" type="button">BACK</button>
+      </div>
+    </section>
+
+    <!-- ================= HOW TO PLAY ================= -->
+    <section class="screen is-hidden" id="screen-how">
+      <div class="screen-wrap">
+        <div class="how-step" data-step="1">
+          <div class="how-art">&#9998;</div>
+          <h2>1. Draw one stroke</h2>
+          <p>Hold and drag. One continuous line, then lift. That is your beast.</p>
+        </div>
+        <div class="how-step is-hidden" data-step="2">
+          <div class="how-art">&#9670;</div>
+          <h2>2. Shape becomes stats</h2>
+          <p>Fat is armour. Spiky is attack. Big is slow. Thin is fast and fragile.</p>
+        </div>
+        <div class="how-step is-hidden" data-step="3">
+          <div class="how-art">&#9889;</div>
+          <h2>3. Survive sixty seconds</h2>
+          <p>Steer with the joystick, dash with the right button. Dash kills fast.</p>
+        </div>
+        <button class="btn gold" id="btn-how-next" type="button">NEXT</button>
+        <button class="link" id="btn-how-skip" type="button">Skip</button>
+      </div>
+    </section>
+
+    <!-- ================= DRAW ================= -->
+    <section class="screen is-hidden" id="screen-draw">
+      <div class="paper-card draw-card">
+        <h2 class="card-title">DRAW YOUR BEAST</h2>
+        <p class="card-sub">Draw one continuous shape (max ink: 1200 px)</p>
+
+        <div class="ink-row">
+          <span class="ink-label">Ink</span>
+          <div class="ink-bar"><i id="ink-fill"></i></div>
+          <span class="ink-count" id="ink-text">1200 / 1200</span>
+        </div>
+
+        <div class="draw-main">
+          <div class="starters">
+            <span class="starters-label">Starters</span>
+            <button class="starter" type="button" data-starter="0"><canvas width="54" height="54"></canvas></button>
+            <button class="starter" type="button" data-starter="1"><canvas width="54" height="54"></canvas></button>
+            <button class="starter" type="button" data-starter="2"><canvas width="54" height="54"></canvas></button>
+          </div>
+          <div class="canvas-slot">
+            <canvas id="draw-canvas" width="320" height="300"></canvas>
+            <span class="canvas-hint" id="draw-hint">HOLD AND DRAG</span>
+          </div>
+        </div>
+
+        <div class="row-buttons">
+          <button class="btn violet" id="btn-redraw" type="button">&#8635; REDRAW</button>
+          <button class="btn gold" id="btn-done" type="button" disabled>DONE &#10003;</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= YOUR BEAST ================= -->
+    <section class="screen is-hidden" id="screen-beast">
+      <div class="paper-card">
+        <h2 class="card-title">YOUR BEAST</h2>
+        <div class="beast-row">
+          <canvas id="beast-canvas" width="240" height="190"></canvas>
+          <div class="stat-list" id="stat-list"></div>
+        </div>
+        <p class="derived" id="derived">Derived from your drawing:</p>
+        <p class="trait-line">TRAIT: <b id="trait-tag">BALANCED</b></p>
+        <button class="btn gold" id="btn-enter" type="button">ENTER ARENA</button>
+        <button class="link" id="btn-back-draw" type="button">Redraw</button>
+      </div>
+    </section>
+
+    <!-- ================= RESULT ================= -->
+    <section class="screen is-hidden" id="screen-result">
+      <div class="paper-card">
+        <h2 class="card-title" id="result-title">RUN COMPLETE!</h2>
+        <div class="result-row">
+          <div class="result-stats">
+            <div class="res-row"><span>&#9201;</span><b id="res-time">60.0 s</b></div>
+            <div class="res-row"><span>&#9760;</span><b id="res-kills">0</b></div>
+            <div class="res-row"><span>&#9733;</span><b id="res-score">0</b></div>
+            <div class="res-flag is-hidden" id="res-best">NEW BEST!</div>
+          </div>
+          <canvas id="result-beast" width="200" height="160"></canvas>
+          <div class="grade" id="res-grade">S</div>
+        </div>
+        <div class="row-buttons">
+          <button class="btn violet" id="btn-again" type="button">&#8635; PLAY AGAIN</button>
+          <button class="btn gold" id="btn-share" type="button">SHARE PORTRAIT</button>
+        </div>
+        <canvas id="share-card" class="share-card is-hidden" width="540" height="540"></canvas>
+        <button class="link" id="btn-save-card" type="button">Save portrait</button>
+        <button class="link" id="btn-newbeast" type="button">Draw a new beast</button>
+        <button class="link" id="btn-home" type="button">Back to title</button>
+      </div>
+    </section>
+
+    <!-- ================= MY BEASTS ================= -->
+    <section class="screen is-hidden" id="screen-beasts">
+      <div class="screen-wrap">
+        <h2 class="screen-title">MY BEASTS</h2>
+        <div class="beasts" id="beasts-list"></div>
+        <button class="btn violet" id="btn-beasts-back" type="button">BACK</button>
+      </div>
+    </section>
+
+    <div class="toast is-hidden" id="toast"></div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

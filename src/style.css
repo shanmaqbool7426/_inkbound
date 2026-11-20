@@ -1,0 +1,922 @@
+:root {
+  --bg-deep: #120a1f;
+  --bg: #1b1030;
+  --violet: #7a2fc0;
+  --violet-lite: #b06bff;
+  --violet-dark: #4a1a7a;
+  --paper: #f5edd6;
+  --paper-2: #e7dcbe;
+  --ink: #241436;
+  --gold: #f5c445;
+  --gold-dark: #d99a1c;
+  --red: #d92b3f;
+  --text: #efe6ff;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  background: radial-gradient(circle at 50% 20%, #3a2260 0%, #1b1030 45%, #0d0716 100%);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+  touch-action: none;
+}
+
+#stage {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+/* ================= HUD ================= */
+.hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  padding: max(10px, env(safe-area-inset-top)) 14px max(10px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 8px;
+  z-index: 5;
+}
+
+.hud-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hp-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(20, 8, 32, 0.72);
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 4px 10px 4px 6px;
+  flex: 1;
+  max-width: 62%;
+}
+
+.hp-ico {
+  color: #ff5a72;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.hp {
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+.hp i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff5a72, #ff8fa3);
+  transition: width 120ms linear;
+}
+
+.hp-chip span:last-child {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  font-variant-numeric: tabular-nums;
+  color: #ffdbe2;
+}
+
+.chip {
+  background: rgba(20, 8, 32, 0.72);
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-score {
+  align-self: flex-end;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-weight: 900;
+  font-size: 20px;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-score b {
+  font-size: 12px;
+  color: var(--gold);
+}
+
+/* ================= SCREENS ================= */
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 14px;
+  overflow-y: auto;
+  background: radial-gradient(circle at 50% 25%, rgba(58, 34, 96, 0.96) 0%, rgba(20, 11, 34, 0.98) 60%, rgba(9, 5, 15, 1) 100%);
+}
+
+/* `margin: auto` centres without ever clipping the top of an overflowing
+   flex child (unlike `align-items: center`, which pushes content out of
+   reach on short viewports). */
+.screen > * {
+  margin: auto;
+}
+
+.screen--title {
+  background: transparent;
+}
+
+.screen-wrap {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  text-align: center;
+}
+
+.screen-title {
+  font-style: italic;
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  color: #fff;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* ================= TITLE ================= */
+.title-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-block {
+  text-align: center;
+  transform: rotate(-2deg);
+}
+
+.logo {
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(42px, 15vw, 62px);
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: #fff;
+  text-shadow: 0 4px 0 #4a1a7a, 0 8px 0 rgba(0, 0, 0, 0.35), 0 0 30px rgba(176, 107, 255, 0.7);
+}
+
+.logo-sub {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 14px;
+  background: var(--gold);
+  color: var(--ink);
+  font-style: italic;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  border-radius: 4px;
+  transform: rotate(-1deg);
+  box-shadow: 0 3px 0 var(--gold-dark);
+}
+
+.title-beast {
+  width: min(78vw, 300px);
+  height: auto;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.55));
+}
+
+.title-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 4px;
+}
+
+.micro {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: rgba(239, 230, 255, 0.55);
+  text-transform: uppercase;
+}
+
+/* ================= BUTTONS ================= */
+.btn {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 3px solid var(--ink);
+  cursor: pointer;
+  transition: transform 90ms ease, filter 90ms ease;
+  text-transform: uppercase;
+}
+
+.btn:active {
+  transform: translateY(2px);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  filter: grayscale(0.4);
+}
+
+.btn.gold {
+  background: linear-gradient(180deg, #ffe17a 0%, var(--gold) 55%, #e0a41d 100%);
+  color: var(--ink);
+  box-shadow: 0 5px 0 #a97612, 0 10px 20px rgba(0, 0, 0, 0.35);
+}
+
+.btn.violet {
+  background: linear-gradient(180deg, #6c2ba8 0%, #4a1a7a 100%);
+  color: #f3e9ff;
+  border-color: #1d0f2e;
+  box-shadow: 0 5px 0 #2a1040, 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn.violet.thin {
+  padding: 10px 14px;
+  font-size: 12px;
+}
+
+.link {
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  color: rgba(239, 230, 255, 0.65);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 7px;
+  cursor: pointer;
+}
+
+.icon-btn {
+  position: fixed;
+  right: 14px;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  z-index: 12;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  background: rgba(20, 8, 32, 0.6);
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* ================= PAPER CARD ================= */
+.paper-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  max-height: 100%;
+  overflow-y: auto;
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  padding: 14px;
+  color: var(--ink);
+  box-shadow: 0 12px 0 rgba(0, 0, 0, 0.35), 0 0 0 6px rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: center;
+}
+
+.card-title {
+  font-style: italic;
+  font-weight: 900;
+  font-size: 19px;
+  letter-spacing: 0.02em;
+  transform: rotate(-1deg);
+}
+
+.card-sub {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(36, 20, 54, 0.65);
+  margin-top: -6px;
+}
+
+.row-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.row-buttons .btn {
+  flex: 1;
+  font-size: 13px;
+  padding: 12px 8px;
+}
+
+/* ================= DRAW ================= */
+.draw-card {
+  max-width: 440px;
+  padding: 10px;
+}
+
+.ink-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.ink-label {
+  letter-spacing: 0.08em;
+  color: rgba(36, 20, 54, 0.7);
+}
+
+.ink-bar {
+  flex: 1;
+  height: 16px;
+  border: 2.5px solid var(--ink);
+  border-radius: 999px;
+  background: #ddd0ab;
+  overflow: hidden;
+}
+
+.ink-bar i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #b06bff, #6c2ba8);
+  transition: width 60ms linear;
+}
+
+.ink-count {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.draw-main {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.starters {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  width: 62px;
+  flex-shrink: 0;
+}
+
+.starters-label {
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: rgba(36, 20, 54, 0.55);
+}
+
+.starter {
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  border: 2px solid rgba(36, 20, 54, 0.35);
+  border-radius: 8px;
+  background: var(--paper-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.starter:active {
+  transform: translateY(1px);
+}
+
+.starter canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.canvas-slot {
+  position: relative;
+  flex: 1;
+  min-height: 240px;
+  border: 2.5px dashed rgba(36, 20, 54, 0.35);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff8e4;
+}
+
+#draw-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.canvas-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: rgba(36, 20, 54, 0.35);
+  pointer-events: none;
+}
+
+/* ================= YOUR BEAST ================= */
+.beast-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#beast-canvas {
+  width: 46%;
+  height: auto;
+  background: radial-gradient(circle at 50% 45%, #f0e5c6 0%, #e2d5b1 100%);
+  border: 2.5px solid var(--ink);
+  border-radius: 8px;
+}
+
+.stat-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: #efe3c2;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  padding: 4px 9px 5px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+.stat-row .bar {
+  flex-basis: 100%;
+  height: 6px;
+  border: 1.5px solid rgba(36, 20, 54, 0.55);
+  border-radius: 999px;
+  background: #d8caa4;
+  overflow: hidden;
+}
+
+.stat-row .bar b {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #b06bff, #6c2ba8);
+  transition: width 720ms cubic-bezier(0.22, 0.9, 0.24, 1);
+}
+
+.stat-row .ico {
+  width: 14px;
+  text-align: center;
+  font-size: 11px;
+}
+
+.stat-row .ico.accent {
+  color: var(--red);
+}
+
+.stat-row .val {
+  margin-left: auto;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.derived {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(36, 20, 54, 0.7);
+  line-height: 1.6;
+}
+
+.trait-line {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: rgba(36, 20, 54, 0.7);
+}
+
+.trait-line b {
+  color: var(--violet-dark);
+}
+
+/* ================= RESULT ================= */
+.result-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.result-stats {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+}
+
+.res-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #efe3c2;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 5px 9px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.res-row b {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.res-flag {
+  display: inline-block;
+  align-self: flex-start;
+  background: linear-gradient(180deg, #ffe17a, var(--gold));
+  border: 2px solid var(--ink);
+  border-radius: 5px;
+  padding: 2px 7px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  transform: rotate(-2deg);
+}
+
+#result-beast {
+  width: 34%;
+  height: auto;
+}
+
+.grade {
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: italic;
+  font-weight: 900;
+  font-size: 28px;
+  color: var(--ink);
+  background: radial-gradient(circle, #ffe17a 0%, var(--gold) 70%, #d99a1c 100%);
+  border: 3px solid var(--ink);
+  clip-path: polygon(50% 0%, 62% 12%, 78% 6%, 84% 22%, 100% 30%, 92% 46%, 100% 62%, 84% 70%, 78% 88%, 60% 84%, 50% 100%, 40% 84%, 22% 88%, 16% 70%, 0% 62%, 8% 46%, 0% 30%, 16% 22%, 22% 6%, 38% 12%);
+}
+
+.share-card {
+  width: 100%;
+  height: auto;
+  border: 2.5px solid var(--ink);
+  border-radius: 6px;
+  display: block;
+}
+
+/* ================= LEVELS ================= */
+.levels {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.level {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+  font: inherit;
+}
+
+.level.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.level-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}
+
+.level-info {
+  flex: 1;
+}
+
+.level-name {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+}
+
+.level-blurb {
+  font-size: 10px;
+  color: rgba(239, 230, 255, 0.6);
+}
+
+.level-stars {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--gold);
+}
+
+/* ================= BEASTS ================= */
+.beasts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.beast-card {
+  background: var(--paper);
+  border: 2.5px solid var(--ink);
+  border-radius: 10px;
+  padding: 6px;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+}
+
+.beast-card canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.beast-card span {
+  display: block;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  margin-top: 3px;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  font-size: 11px;
+  color: rgba(239, 230, 255, 0.6);
+  padding: 18px;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+/* ================= HOW ================= */
+.how-art {
+  height: 96px;
+  border: 2.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  margin-bottom: 10px;
+  color: var(--gold);
+}
+
+.how-step h2 {
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  margin-bottom: 6px;
+}
+
+.how-step p {
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(239, 230, 255, 0.72);
+  margin-bottom: 12px;
+}
+
+/* ================= TOAST ================= */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 100px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 2px solid var(--gold);
+  z-index: 30;
+  pointer-events: none;
+  white-space: nowrap;
+  animation: toast-in 160ms ease;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (max-height: 640px) {
+  .logo {
+    font-size: 36px;
+  }
+  .logo-sub {
+    font-size: 11px;
+    padding: 3px 11px;
+  }
+  .title-wrap {
+    gap: 7px;
+  }
+  .title-beast {
+    width: min(52vw, 170px);
+  }
+  .title-actions {
+    gap: 6px;
+    margin-top: 0;
+  }
+  .btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .paper-card {
+    padding: 10px;
+    gap: 7px;
+  }
+  .card-title {
+    font-size: 16px;
+  }
+  .beast-row {
+    gap: 6px;
+  }
+  .stat-row {
+    font-size: 9px;
+    padding: 3px 7px;
+  }
+  .stat-row .val {
+    font-size: 11px;
+  }
+  .canvas-slot {
+    min-height: 170px;
+  }
+  .starter {
+    width: 44px;
+    height: 44px;
+  }
+  .starters {
+    width: 52px;
+    gap: 5px;
+  }
+  .how-art {
+    height: 58px;
+    font-size: 28px;
+  }
+  .how-step h2 {
+    font-size: 14px;
+  }
+  .how-step p {
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+}
+
+/* Very short landscape viewports: keep every action on screen without
+   scrolling. */
+@media (max-height: 520px) {
+  .logo {
+    font-size: 28px;
+  }
+  .title-beast {
+    width: 96px;
+  }
+  .title-meta,
+  .micro {
+    font-size: 9px;
+  }
+  .btn {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+  .btn.violet.thin {
+    padding: 7px 10px;
+    font-size: 10px;
+  }
+  .paper-card {
+    padding: 8px;
+    gap: 5px;
+    border-width: 2.5px;
+  }
+  .card-title {
+    font-size: 14px;
+  }
+  .card-sub {
+    display: none;
+  }
+  .canvas-slot {
+    min-height: 130px;
+  }
+  .starter {
+    width: 38px;
+    height: 38px;
+  }
+  .starters {
+    width: 44px;
+    gap: 4px;
+  }
+  .row-buttons .btn {
+    padding: 8px 6px;
+    font-size: 11px;
+  }
+  #beast-canvas {
+    width: 38%;
+  }
+  .derived {
+    font-size: 9px;
+    line-height: 1.4;
+  }
+  .how-art {
+    height: 44px;
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+}
